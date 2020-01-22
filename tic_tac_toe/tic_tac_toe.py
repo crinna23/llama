@@ -1,12 +1,19 @@
 import numpy 
 import time
 
-#global array
+# global array - board
 arr = numpy.array( [['7', '8', '9'],
                     ['4', '5', '6'], 
                     ['1', '2', '3']] )
 
+# global dictionary for position on board
 positions = { '1':(2,0), '2':(2,1), '3':(2,2), '4':(1,0), '5':(1,1), '6':(1,2), '7':(0,0), '8':(0,1), '9':(0,2)}
+
+#global players
+first_player = ''
+second_player = ''
+x01 = ''
+x02 = ''
 
 def get_position(positions, num_str):
     for key, item in positions.items():
@@ -83,9 +90,27 @@ def is_cell_taken(arr, num, positions):
         cell = get_position(positions, str(num))
         return arr[cell[0], cell[1]] == 'x' or arr[cell[0], cell[1]] == '0'
 
+# maybe find a different way to solve this
+def is_board_full(arr):
+    str_list = list()
+    for i in range(0,3):
+       for m in arr[:, i]:
+           str_list.append(m)
+           
+    for i in range(1,10):
+        str_i = str(i)
+        if str_i in str_list:
+            break
+        else:
+            return True
+
+ 
 def play_round(player, x0):
     while True:
         try:
+            if is_board_full(arr):
+                print('Game over!')
+                break
             num = int(input('{} please choose a number where you want the {} to go: '.format(player, x0)))
             if num > 9 or num == 0:
                 print('The number should be between 1 and 9')
@@ -93,27 +118,38 @@ def play_round(player, x0):
             elif is_cell_taken(arr, num, positions):
                 print('This cell is already filled, please choose another one.')
                 continue
+          #  if is_board_full(arr):
+          #      pritn('Game over! No winner.')
+          #      return True
+          #      break
+            # elif is_board_full(arr):
+             #   play_again = input('The game is over, there are no winners. Do you want to play again? Y | N: {}'.format(play_again)).upper()
+             #   if play_again == 'n':
+            #      break
+              #  elif play_again == 'y':
+              #      play_game(first_player, second_player, x01, x02)
+              #  else:
+              #      break
             else:
                 update_board(arr, num, x0)
                 draw_board(arr)
                 if win_check(arr):
-                    print('{} is a Winner!!! Great job!'.format(num))
+                    print('{} is a Winner!!! Great job!'.format(player))
+                    return True
                     break
-                # call the other guy
-                print('Next player, please choose your number: ')
-                play_round(player, x0)
         except ValueError:
             print('Sorry, you can only choose a number between 1 and 9')
             continue
         else:
             break
 
-def play_game():
+def play_game(first_player, second_player, x01, x02):
     print('Play Tic Tac Toe!')
-    x02 = ''
-    x01 = ''
 
     first_player = input('First player, name: ')
+    if(first_player == ''):
+        first_player = 'Bob'
+        print('I will call you Bob!')
     x0 = input('{} do you want to play with x or 0 ?'.format(first_player))
     if x0 == '0':
         x01 = '0'
@@ -122,45 +158,35 @@ def play_game():
     elif x0 != '0' or  x0 != 'x' or x0 != 'X':
         print('What about x ?')
         x01 = 'x'
-    current_player = first_player
 
     second_player = input('Second player, name: ')
+    if(second_player == ''):
+        second_player == 'Mikey'
+        print('I will call you Mikey!')
     if x01 == 'x':
         print('{} you will have {} '.format(second_player, '0'))
         x02 = '0'
     elif x01 == '0':
         print('{} you will have {} '.format(second_player, 'x'))
         x02 = 'x'
-    time.sleep(2)
-
-    draw_board(arr)
-    play_round(first_player, x01)
-   # while True:
-   #     try:
-          #  first_num = int(input('{} please choose a number where you want the {} to go: '.format(first_player, x01)))
-          #  if first_num > 9 or first_num == 0:
-          #      print('The number should be between 1 and 9')
-          #      continue 
-          #  elif is_cell_taken(arr, first_num, positions):
-          #      print('This cell is already filled, please choose another one.')
-          #      continue
-          #  else:
-          #      update_board(arr, first_num, x01)
-          #      draw_board(arr)
-          #      if win_check(arr):
-          #          print('{} is a Winner!!! Great job!'.format(first_num))
-          #          break
-          #      #call the second guy
-          #      second_num = int(input('It is your turn.'))
-   #       round_play(first_player, x01)
-   #       continue
-          #round_play(second_player, x02)
-      #  except ValueError:
-       #     print('Sorry, you can only choose a number between 1 and 9')
-       #     continue
-      #  else:
-      #      break
+    time.sleep(1)
+    
+    reset_board(arr)
+    draw_board(arr) 
+    
+    isFirstWinner = play_round(first_player, x01)
+    isSecondWinner =  play_round(second_player, x02)
+    while True:
+        print('Is the first a winner?: {} '.format(isFirstWinner))
+        print('Is the second a winner?: {} '.format(isSecondWinner))
+            
+        isFirstWinner = play_round(first_player, x01)
+        if isFirstWinner or isSecondWinner or is_board_full(arr):
+            break
+        isSecondWinner = play_round(second_player, x02)
+        if isFirstWinner or isSecondWinner or is_board_full(arr):
+            break
 
 #update_board(arr, 5, 'x')
-play_game()
+play_game(first_player, second_player, x01, x02)
 
