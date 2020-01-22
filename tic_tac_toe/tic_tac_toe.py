@@ -1,5 +1,6 @@
 import numpy 
 import time
+import random
 
 # global array - board
 arr = numpy.array( [['7', '8', '9'],
@@ -91,6 +92,7 @@ def is_cell_taken(arr, num, positions):
         return arr[cell[0], cell[1]] == 'x' or arr[cell[0], cell[1]] == '0'
 
 # maybe find a different way to solve this
+# checks to see if board is full
 def is_board_full(arr):
     str_list = list()
     for i in range(0,3):
@@ -104,12 +106,11 @@ def is_board_full(arr):
         else:
             return True
 
- 
 def play_round(player, x0):
     while True:
         try:
             if is_board_full(arr):
-                print('Game over!')
+                print('Game over! No winners!')
                 break
             num = int(input('{} please choose a number where you want the {} to go: '.format(player, x0)))
             if num > 9 or num == 0:
@@ -118,18 +119,6 @@ def play_round(player, x0):
             elif is_cell_taken(arr, num, positions):
                 print('This cell is already filled, please choose another one.')
                 continue
-          #  if is_board_full(arr):
-          #      pritn('Game over! No winner.')
-          #      return True
-          #      break
-            # elif is_board_full(arr):
-             #   play_again = input('The game is over, there are no winners. Do you want to play again? Y | N: {}'.format(play_again)).upper()
-             #   if play_again == 'n':
-            #      break
-              #  elif play_again == 'y':
-              #      play_game(first_player, second_player, x01, x02)
-              #  else:
-              #      break
             else:
                 update_board(arr, num, x0)
                 draw_board(arr)
@@ -146,6 +135,7 @@ def play_round(player, x0):
 def play_game(first_player, second_player, x01, x02):
     print('Play Tic Tac Toe!')
 
+# settup the players - this ca be simplified and put in a separate function
     first_player = input('First player, name: ')
     if(first_player == ''):
         first_player = 'Bob'
@@ -176,17 +166,23 @@ def play_game(first_player, second_player, x01, x02):
     
     isFirstWinner = play_round(first_player, x01)
     isSecondWinner =  play_round(second_player, x02)
-    while True:
-        print('Is the first a winner?: {} '.format(isFirstWinner))
-        print('Is the second a winner?: {} '.format(isSecondWinner))
-            
+    while True: 
         isFirstWinner = play_round(first_player, x01)
         if isFirstWinner or isSecondWinner or is_board_full(arr):
-            break
-        isSecondWinner = play_round(second_player, x02)
-        if isFirstWinner or isSecondWinner or is_board_full(arr):
-            break
+            play_again = input('Do you want to play again? Y | N: ').lower()
+            if play_again == 'y':
+                play_game(first_player, second_player, x01, x02)
+            elif play_again == 'n':
+                break
 
-#update_board(arr, 5, 'x')
+        isSecondWinner = play_round(second_player, x02)
+        if isFirstWinner or isSecondWinner or is_board_full(arr): 
+            play_again = input('Do you want to play again? Y | N: ').lower()
+            if play_again == 'y':
+                play_game(first_player, second_player, x01, x02)
+            elif play_again == 'n':
+                break
+
+
 play_game(first_player, second_player, x01, x02)
 
